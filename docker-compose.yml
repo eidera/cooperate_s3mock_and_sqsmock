@@ -1,0 +1,46 @@
+version: '3'
+services:
+  s3_mock:
+    container_name: s3-mock
+    image: minio/minio:RELEASE.2017-08-05T00-00-53Z
+    ports:
+      - '9000:9000'
+    volumes:
+      - s3_data:/data
+    environment:
+      - 'MINIO_ACCESS_KEY=AKIAIOSFODNN7EXAMPLE'
+      - 'MINIO_SECRET_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY'
+    command: server /data
+
+  sqs_mock:
+    container_name: sqs-mock
+    build:
+      context: ./build
+      dockerfile: sqsMockDockerfile
+    ports:
+      - '9324:9324'
+
+  sqs_sender:
+    container_name: sqs-sender
+    build:
+      context: ./build
+      dockerfile: sqsSenderDockerfile
+    ports:
+      - '9030:9030'
+    volumes:
+      - ./src/sqs_sender:/app
+    command: ruby /app/sqs_sender.rb
+
+  s3_proxy:
+    container_name: s3-proxy
+    build:
+      context: ./build
+      dockerfile: s3ProxyDockerfile
+    ports:
+      - '9001:9001'
+    volumes:
+      - ./src/s3_proxy:/app
+    command: ruby /app/proxy.rb
+
+volumes:
+    s3_data:
