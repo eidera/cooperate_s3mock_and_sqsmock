@@ -6,11 +6,11 @@ services:
     ports:
       - '9000:9000'
     volumes:
-      - s3_data:/data
+      - s3_data:/export
     environment:
       - 'MINIO_ACCESS_KEY=AKIAIOSFODNN7EXAMPLE'
       - 'MINIO_SECRET_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY'
-    command: server /data
+    command: server /export
 
   sqs_mock:
     container_name: sqs-mock
